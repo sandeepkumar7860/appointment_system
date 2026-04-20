@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Admin Dashboard</h1>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Appointments</h5>
+                    <h2>{{ total_appointments }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Appointments</h5>
+                    <h2>{{ pending_appointments }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Granted Appointments</h5>
+                    <h2>{{ granted_appointments }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Teachers</h5>
+                    <h2>{{ total_teachers }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Recent Appointments -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Recent Appointments (Last 7 Days)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Teacher</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in recent_appointments %}
+                                <tr>
+                                    <td>{{ appointment.user.username }}</td>
+                                    <td>{{ appointment.teacher.name }}</td>
+                                    <td>{{ appointment.date }}</td>
+                                    <td>{{ appointment.time_slot }}</td>
+                                    <td>
+                                        <span class="badge {% if appointment.status == 'pending' %}bg-warning{% else %}bg-success{% endif %}">
+                                            {{ appointment.status|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ appointment.created_at|date:"M d, H:i" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No recent appointments</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Appointments -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Today's Appointments</h5>
+                </div>
+                <div class="card-body">
+                    {% for appointment in todays_appointments %}
+                    <div class="mb-2 p-2 border rounded">
+                        <strong>{{ appointment.time_slot }}</strong><br>
+                        <small>{{ appointment.user.username }} with {{ appointment.teacher.name }}</small><br>
+                        <span class="badge {% if appointment.status == 'pending' %}bg-warning{% else %}bg-success{% endif %}">
+                            {{ appointment.status|title }}
+                        </span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No appointments today</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Appointments by Status -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Appointments by Status</h5>
+                </div>
+                <div class="card-body">
+                    {% for status_data in appointments_by_status %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>{{ status_data.status|title }}</span>
+                        <div class="progress flex-grow-1 mx-3" style="height: 20px;">
+                            <div class="progress-bar {% if status_data.status == 'pending' %}bg-warning{% else %}bg-success{% endif %}"
+                                 style="width: {% if total_appointments > 0 %}{% widthratio status_data.count total_appointments 100 %}{% else %}0{% endif %}%">
+                                {{ status_data.count }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointments by Teacher -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Top Teachers by Appointments</h5>
+                </div>
+                <div class="card-body">
+                    {% for teacher_data in appointments_by_teacher %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>{{ teacher_data.teacher__name }}</span>
+                        <span class="badge bg-primary">{{ teacher_data.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'manage_appointments' %}" class="btn btn-primary me-2">
+                        <i class="bi bi-list-check"></i> Manage Appointments
+                    </a>
+                    <a href="{% url 'admin:index' %}" class="btn btn-secondary me-2">Django Admin</a>
+                    <a href="{% url 'admin:appointments_appointment_changelist' %}" class="btn btn-secondary me-2">Edit Appointments</a>
+                    <a href="{% url 'admin:appointments_teacher_changelist' %}" class="btn btn-secondary me-2">Manage Teachers</a>
+                    <a href="{% url 'admin:auth_user_changelist' %}" class="btn btn-secondary">Manage Users</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

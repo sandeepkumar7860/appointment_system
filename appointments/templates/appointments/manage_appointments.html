@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Appointments{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">Manage Appointments</h1>
+            <p class="text-muted">Review, approve, or reject appointment requests</p>
+        </div>
+    </div>
+
+    <!-- Filter and Search Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-6">
+                            <input type="text" name="search" class="form-control" placeholder="Search by student name or teacher name..." value="{{ search_query }}">
+                        </div>
+                        <div class="col-md-4">
+                            <select name="status" class="form-select">
+                                <option value="all" {% if filter_status == 'all' %}selected{% endif %}>All Status</option>
+                                <option value="pending" {% if filter_status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="granted" {% if filter_status == 'granted' %}selected{% endif %}>Granted</option>
+                                <option value="rejected" {% if filter_status == 'rejected' %}selected{% endif %}>Rejected</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">Filter</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Appointments ({{ appointments.count }})</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Teacher</th>
+                                <th>Date</th>
+                                <th>Time Slot</th>
+                                <th>Status</th>
+                                <th>Booked On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in appointments %}
+                            <tr>
+                                <td>
+                                    <strong>{{ appointment.user.get_full_name|default:appointment.user.username }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ appointment.user.email }}</small>
+                                </td>
+                                <td>{{ appointment.teacher.name }}</td>
+                                <td>
+                                    <strong>{{ appointment.date }}</strong>
+                                </td>
+                                <td>{{ appointment.time_slot }}</td>
+                                <td>
+                                    {% if appointment.status == 'pending' %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% elif appointment.status == 'granted' %}
+                                        <span class="badge bg-success">Granted</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small>{{ appointment.created_at|date:"M d, Y H:i" }}</small>
+                                </td>
+                                <td>
+                                    {% if appointment.status == 'pending' %}
+                                        <a href="{% url 'approve_appointment' appointment.id %}" class="btn btn-sm btn-success">Review</a>
+                                    {% else %}
+                                        <a href="{% url 'approve_appointment' appointment.id %}" class="btn btn-sm btn-info">View</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <p class="text-muted mb-0">No appointments found</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total</h5>
+                    <h2>{{ appointments.count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+</style>
+{% endblock %}

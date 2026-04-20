@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Appointment{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <a href="{% url 'manage_appointments' %}" class="btn btn-sm btn-secondary mb-3">
+                <i class="bi bi-arrow-left"></i> Back to Appointments
+            </a>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Review Appointment Request</h4>
+                </div>
+
+                <div class="card-body">
+                    <!-- Appointment Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted text-uppercase">Student Information</h6>
+                            <div class="p-3 bg-light rounded mb-3">
+                                <p class="mb-2">
+                                    <strong>Name:</strong> {{ appointment.user.get_full_name|default:appointment.user.username }}
+                                </p>
+                                <p class="mb-2">
+                                    <strong>Email:</strong> {{ appointment.user.email }}
+                                </p>
+                                <p class="mb-2">
+                                    <strong>Username:</strong> {{ appointment.user.username }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-muted text-uppercase">Appointment Details</h6>
+                            <div class="p-3 bg-light rounded mb-3">
+                                <p class="mb-2">
+                                    <strong>Teacher:</strong> {{ appointment.teacher.name }}
+                                </p>
+                                <p class="mb-2">
+                                    <strong>Subject:</strong> {{ appointment.teacher.subject }}
+                                </p>
+                                <p class="mb-2">
+                                    <strong>Date:</strong> <span class="badge bg-info">{{ appointment.date }}</span>
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Time Slot:</strong> <span class="badge bg-info">{{ appointment.time_slot }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status and Message -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-muted text-uppercase">Current Status</h6>
+                            <div class="p-3 bg-light rounded">
+                                <p class="mb-2">
+                                    <strong>Status:</strong>
+                                    {% if appointment.status == 'pending' %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% elif appointment.status == 'granted' %}
+                                        <span class="badge bg-success">Granted</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </p>
+                                {% if appointment.message %}
+                                <p class="mb-0">
+                                    <strong>Message:</strong><br>
+                                    <em>{{ appointment.message }}</em>
+                                </p>
+                                {% endif %}
+                                <p class="text-muted mb-0 mt-2">
+                                    <small>Booked on: {{ appointment.created_at|date:"M d, Y H:i" }}</small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Section -->
+                    {% if appointment.status == 'pending' %}
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="text-muted text-uppercase mb-3">Take Action</h6>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message (Optional)</label>
+                            <textarea class="form-control" id="message" name="message" rows="3" placeholder="Send a message to the student (approval confirmation, rejection reason, etc.)"></textarea>
+                            <small class="text-muted">This message will be visible to the student</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <button type="submit" name="action" value="approve" class="btn btn-success w-100">
+                                    <i class="bi bi-check-circle"></i> Approve Appointment
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="submit" name="action" value="reject" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to reject this appointment?');">
+                                    <i class="bi bi-x-circle"></i> Reject Appointment
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-info" role="alert">
+                        <strong>Note:</strong> This appointment has already been {% if appointment.status == 'granted' %}<strong>approved</strong>{% else %}<strong>rejected</strong>{% endif %}.
+                        You can go back to the appointments list to manage other pending requests.
+                    </div>
+
+                    <a href="{% url 'manage_appointments' %}" class="btn btn-primary">View All Appointments</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 8px;
+    }
+
+    .card-header {
+        border-radius: 8px 8px 0 0;
+        padding: 1.5rem;
+    }
+
+    .badge {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}

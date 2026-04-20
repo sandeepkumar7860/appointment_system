@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            font-family: 'Arial', sans-serif;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #2196f3 0%, #9c27b0 100%);
+        }
+        .navbar-brand, .navbar-nav .nav-link {
+            color: white !important;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        .chat-header {
+            background: linear-gradient(135deg, #2196f3 0%, #9c27b0 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .message.user {
+            background: #e3f2fd;
+            text-align: right;
+        }
+        .message.bot {
+            background: #f3e5f5;
+        }
+        .chat-input {
+            padding: 15px;
+            background: #f8f9fa;
+        }
+        .chat-input input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 25px;
+            border: 1px solid #ddd;
+        }
+        .chat-input button {
+            width: 18%;
+            padding: 10px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #2196f3 0%, #9c27b0 100%);
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'teacher_list' %}">Appointment System</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'my_appointments' %}">My Appointments</a>
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h5>Appointment Chatbot</h5>
+                <p>Ask me anything about booking appointments!</p>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot">Hello! How can I help you with your appointments today?</div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="Type your message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const teachers = [
+            {% for teacher in teachers %}
+            {
+                name: "{{ teacher.name }}",
+                subject: "{{ teacher.subject }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        const responses = {
+            "hello": "Hello! How can I assist you?",
+            "hi": "Hi there! What can I do for you?",
+            "book appointment": "To book an appointment, go to the teacher list and click on a teacher to book.",
+            "how to book": "Navigate to the home page, select a teacher, and click 'Book Appointment'.",
+            "my appointments": "You can view your appointments by clicking 'My Appointments' in the navigation.",
+            "help": "I can help you with booking appointments, viewing your schedule, or general questions.",
+            "teachers": "Here are our teachers: " + teachers.map(t => t.name + " (" + t.subject + ")").join(", "),
+            "list teachers": "Here are our teachers: " + teachers.map(t => t.name + " (" + t.subject + ")").join(", "),
+            "all teachers": "Here are our teachers: " + teachers.map(t => t.name + " (" + t.subject + ")").join(", "),
+            "what if": "Hypothetically, if you're wondering about scenarios, feel free to ask specific questions about appointments or teachers!",
+            "can i": "You can book appointments with any available teacher during open time slots. Make sure to check your schedule!",
+            "how does": "The appointment system works by selecting a teacher, choosing a date and time slot, and confirming your booking.",
+            "why": "Appointments help you connect with teachers for personalized guidance in their subjects.",
+            "when": "You can book appointments during available time slots: 8-9, 9-10, 10-11, or 11-12 on any date.",
+            "where": "All appointments are virtual or at the teacher's designated location. Check with the teacher for details.",
+            "default": "That's an interesting question! In our appointment system, you can book with teachers, view your schedule, and get help with various subjects. What specifically would you like to know?"
+        };
+
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim().toLowerCase();
+            if (message === '') return;
+
+            addMessage(message, 'user');
+            input.value = '';
+
+            const response = getResponse(message);
+            setTimeout(() => addMessage(response, 'bot'), 500);
+        }
+
+        function addMessage(text, sender) {
+            const messages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.textContent = text;
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function getResponse(message) {
+            for (const key in responses) {
+                if (message.includes(key)) {
+                    return responses[key];
+                }
+            }
+            return responses['default'];
+        }
+
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

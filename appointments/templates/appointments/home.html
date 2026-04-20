@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Appointment Booking{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6 text-center mb-4 mb-lg-0">
+            <h1 class="display-4 fw-bold mb-3">Welcome to</h1>
+            <h2 class="display-5 text-primary mb-4">Teacher Appointment System</h2>
+            <p class="lead text-muted mb-4">
+                Schedule and manage teacher appointments with ease
+            </p>
+        </div>
+        <div class="col-lg-6">
+            <img src="https://img.icons8.com/color/512/000000/appointment-reminders.png" alt="Appointments" class="img-fluid" style="max-width: 300px;">
+        </div>
+    </div>
+
+    <!-- Login Section -->
+    <div class="row mb-5">
+        <div class="col-md-8 mx-auto">
+            <div class="card border-0 shadow-lg hover-card">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="bi bi-box-arrow-in-right" style="font-size: 4rem; color: #667eea;"></i>
+                    </div>
+                    <h3 class="card-title mb-3">Login to Your Account</h3>
+                    <p class="card-text text-muted mb-4">
+                        Access the appointment system as a student or administrator
+                    </p>
+                    <a href="{% url 'user_login' %}" class="btn btn-primary btn-lg px-5">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                    <p class="mt-3 text-muted">
+                        Don't have an account? <a href="{% url 'register' %}" class="text-primary fw-bold">Register here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="text-center mb-4">Why Use Our System?</h3>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center p-4 border-0 shadow-sm">
+                <i class="bi bi-calendar-check" style="font-size: 2.5rem; color: #667eea;"></i>
+                <h5 class="mt-3">Easy Scheduling</h5>
+                <p class="text-muted">Book appointments with teachers in just a few clicks</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center p-4 border-0 shadow-sm">
+                <i class="bi bi-shield-check" style="font-size: 2.5rem; color: #764ba2;"></i>
+                <h5 class="mt-3">Secure & Reliable</h5>
+                <p class="text-muted">Your data is safe with our secure authentication system</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center p-4 border-0 shadow-sm">
+                <i class="bi bi-graph-up" style="font-size: 2.5rem; color: #667eea;"></i>
+                <h5 class="mt-3">Admin Dashboard</h5>
+                <p class="text-muted">Comprehensive analytics and management tools</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2) !important;
+    }
+    .btn-primary, .btn-dark {
+        font-size: 1rem;
+        padding: 12px 30px;
+    }
+</style>
+{% endblock %}
