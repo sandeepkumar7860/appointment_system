@@ -1,3 +1,18 @@
+
+
+
+url for run the application
+
+https://appointment-system-ckp6.onrender.com
+
+
+
+
+
+
+
+
+
 # Appointment Booking System - Admin Dashboard
 
 This Django application provides an appointment booking system with a comprehensive admin dashboard for managing teachers, appointments, and users.
